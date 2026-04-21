@@ -6,17 +6,18 @@ export default function PorteiroLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: theme.bg },
-        headerTitleStyle: { color: theme.ink, fontWeight: '700' },
+        headerStyle: { backgroundColor: theme.surface, borderBottomWidth: 1, borderBottomColor: theme.border },
+        headerTitleStyle: { color: theme.ink900, fontWeight: '800' },
         tabBarStyle: {
-          backgroundColor: theme.panel,
+          backgroundColor: theme.surface,
           borderTopColor: theme.border,
-          height: 64,
-          paddingBottom: 8,
-          paddingTop: 8,
+          height: 68,
+          paddingBottom: 10,
+          paddingTop: 10,
         },
-        tabBarActiveTintColor: theme.accent,
-        tabBarInactiveTintColor: theme.muted,
+        tabBarActiveTintColor: theme.primary600,
+        tabBarInactiveTintColor: theme.ink500,
+        tabBarLabelStyle: { fontWeight: '600', fontSize: 11 },
       }}
     >
       <Tabs.Screen
@@ -29,7 +30,7 @@ export default function PorteiroLayout() {
       <Tabs.Screen
         name="scan"
         options={{
-          title: 'QR Code',
+          title: 'Código',
           tabBarIcon: ({ color, size }) => <ScanLine color={color} size={size} />,
         }}
       />

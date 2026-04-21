@@ -6,11 +6,11 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0B0C0F"
+      "backgroundColor": "#f6f8fc"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": { "supportsTablet": true, "bundleIdentifier": "com.toportaria.app" },
@@ -18,7 +18,7 @@
       "package": "com.toportaria.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0B0C0F"
+        "backgroundColor": "#2f64eb"
       }
     },
     "plugins": [
@@ -27,7 +27,7 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#D97757"
+          "color": "#2f64eb"
         }
       ],
       "expo-barcode-scanner"

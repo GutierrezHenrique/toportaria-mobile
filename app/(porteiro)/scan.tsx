@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, Pressable, Alert, StyleSheet, TextInput } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { ScanLine } from 'lucide-react-native';
 import { api } from '@/lib/api';
 import { theme } from '@/lib/theme';
 
@@ -18,7 +19,7 @@ export default function Scan() {
   async function submitCode(code: string) {
     try {
       const { data } = await api.post('/visitors/code', { code });
-      Alert.alert('Autorizado', `Visita de ${data.name} aprovada`);
+      Alert.alert('Autorizado', `Visita de ${data.name} aprovada.`);
     } catch (e: any) {
       Alert.alert('Erro', e?.response?.data?.message ?? 'Código inválido');
     } finally {
@@ -28,7 +29,15 @@ export default function Scan() {
 
   return (
     <View style={s.root}>
-      <Text style={s.h1}>Validar código de visita</Text>
+      <View style={s.head}>
+        <View style={s.headIcon}>
+          <ScanLine size={20} color={theme.primary700} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={s.overline}>Pré-autorização</Text>
+          <Text style={s.title}>Ler código de visita</Text>
+        </View>
+      </View>
 
       <View style={s.scanner}>
         {permission === false && <Text style={s.info}>Sem permissão de câmera</Text>}
@@ -36,19 +45,24 @@ export default function Scan() {
         {permission && (
           <BarCodeScanner
             style={StyleSheet.absoluteFillObject}
-            onBarCodeScanned={scanned ? undefined : ({ data }) => {
-              setScanned(true);
-              submitCode(String(data));
-            }}
+            onBarCodeScanned={
+              scanned
+                ? undefined
+                : ({ data }) => {
+                    setScanned(true);
+                    submitCode(String(data));
+                  }
+            }
           />
         )}
+        <View style={s.reticule} pointerEvents="none" />
       </View>
 
-      <Text style={s.or}>ou digite manualmente</Text>
+      <Text style={s.or}>OU DIGITE MANUALMENTE</Text>
       <TextInput
         style={s.input}
-        placeholder="Código"
-        placeholderTextColor={theme.muted}
+        placeholder="Código de 8 caracteres"
+        placeholderTextColor={theme.ink500}
         autoCapitalize="characters"
         value={manualCode}
         onChangeText={setManualCode}
@@ -58,7 +72,7 @@ export default function Scan() {
         disabled={!manualCode}
         onPress={() => submitCode(manualCode)}
       >
-        <Text style={{ color: '#fff', fontWeight: '700' }}>Validar</Text>
+        <Text style={s.btnText}>Validar código</Text>
       </Pressable>
     </View>
   );
@@ -66,24 +80,74 @@ export default function Scan() {
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: theme.bg, padding: 20 },
-  h1: { color: theme.ink, fontSize: 22, fontWeight: '700', marginBottom: 12 },
-  scanner: {
-    height: 320,
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: theme.panel2,
+  head: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
+  headIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: theme.primary50,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  info: { color: theme.muted },
-  or: { color: theme.muted, textAlign: 'center', marginVertical: 16 },
-  input: {
-    backgroundColor: theme.panel2,
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: 12,
-    color: theme.ink,
-    padding: 14,
+  overline: {
+    color: theme.primary700,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
-  btn: { backgroundColor: theme.accent, borderRadius: 12, padding: 14, alignItems: 'center', marginTop: 12 },
+  title: { color: theme.ink900, fontSize: 22, fontWeight: '800' },
+  scanner: {
+    height: 320,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: theme.ink900,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reticule: {
+    width: 220,
+    height: 220,
+    borderRadius: 20,
+    borderWidth: 3,
+    borderColor: theme.primary400,
+    shadowColor: theme.primary400,
+    shadowOpacity: 0.6,
+    shadowRadius: 20,
+  },
+  info: { color: 'white' },
+  or: {
+    color: theme.ink500,
+    textAlign: 'center',
+    marginTop: 22,
+    marginBottom: 12,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  input: {
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.borderStrong,
+    borderRadius: 12,
+    color: theme.ink900,
+    padding: 14,
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 2,
+    textAlign: 'center',
+  },
+  btn: {
+    backgroundColor: theme.primary600,
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    marginTop: 10,
+    shadowColor: theme.primary600,
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+  },
+  btnText: { color: 'white', fontWeight: '700', fontSize: 15 },
 });

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAuth } from '@/store/auth';
 import { registerForPushAndSync } from '@/lib/push';
+import { theme } from '@/lib/theme';
 
 const qc = new QueryClient();
 
@@ -30,8 +31,13 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={qc}>
       <SafeAreaProvider>
-        <StatusBar style="light" />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0B0C0F' } }} />
+        <StatusBar style="dark" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: theme.bg },
+          }}
+        />
       </SafeAreaProvider>
     </QueryClientProvider>
   );

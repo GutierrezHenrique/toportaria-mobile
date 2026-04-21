@@ -10,6 +10,7 @@ import {
   FlatList,
 } from 'react-native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { UserPlus, Users as UsersIcon } from 'lucide-react-native';
 import { api } from '@/lib/api';
 import { theme } from '@/lib/theme';
 
@@ -30,7 +31,7 @@ export default function PorteiroRegister() {
   const register = useMutation({
     mutationFn: async () => (await api.post('/visitors', form)).data,
     onSuccess: () => {
-      Alert.alert('OK', 'Visitante registrado, morador notificado');
+      Alert.alert('Visitante registrado', 'Morador foi notificado para aprovar a entrada.');
       setForm({ name: '', document: '', plate: '', unitId: '' });
       qc.invalidateQueries({ queryKey: ['visitors'] });
     },
@@ -45,73 +46,107 @@ export default function PorteiroRegister() {
 
   return (
     <ScrollView style={s.root} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
-      <Text style={s.h1}>Novo visitante</Text>
+      <View style={s.hero}>
+        <View style={s.heroIcon}>
+          <UserPlus size={20} color={theme.primary700} />
+        </View>
+        <Text style={s.heroOverline}>Portaria · nova entrada</Text>
+        <Text style={s.heroTitle}>Registrar visitante</Text>
+        <Text style={s.heroSub}>Preencha os dados para notificar o morador.</Text>
+      </View>
 
-      <Text style={s.label}>Nome</Text>
-      <TextInput
-        style={s.input}
-        value={form.name}
-        onChangeText={(t) => setForm({ ...form, name: t })}
-      />
+      <View style={s.card}>
+        <Text style={s.label}>Nome completo</Text>
+        <TextInput
+          style={s.input}
+          value={form.name}
+          onChangeText={(t) => setForm({ ...form, name: t })}
+          placeholder="João Silva"
+          placeholderTextColor={theme.ink500}
+        />
 
-      <Text style={s.label}>Documento</Text>
-      <TextInput
-        style={s.input}
-        value={form.document}
-        onChangeText={(t) => setForm({ ...form, document: t })}
-      />
+        <Text style={s.label}>Documento</Text>
+        <TextInput
+          style={s.input}
+          value={form.document}
+          onChangeText={(t) => setForm({ ...form, document: t })}
+          placeholder="CPF ou RG"
+          placeholderTextColor={theme.ink500}
+        />
 
-      <Text style={s.label}>Placa (opcional)</Text>
-      <TextInput
-        style={s.input}
-        autoCapitalize="characters"
-        value={form.plate}
-        onChangeText={(t) => setForm({ ...form, plate: t.toUpperCase() })}
-      />
+        <Text style={s.label}>Placa do veículo (opcional)</Text>
+        <TextInput
+          style={s.input}
+          autoCapitalize="characters"
+          value={form.plate}
+          onChangeText={(t) => setForm({ ...form, plate: t.toUpperCase() })}
+          placeholder="ABC1D23"
+          placeholderTextColor={theme.ink500}
+        />
 
-      <Text style={s.label}>Unidade</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
-        {(units.data ?? []).map((u: any) => {
-          const active = form.unitId === u.id;
-          return (
-            <Pressable
-              key={u.id}
-              onPress={() => setForm({ ...form, unitId: u.id })}
-              style={[s.chip, active && { backgroundColor: theme.accent, borderColor: theme.accent }]}
-            >
-              <Text style={{ color: active ? '#fff' : theme.ink, fontWeight: '600' }}>
-                {u.block ? `${u.block}-` : ''}
-                {u.number}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+        <Text style={s.label}>Unidade de destino</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
+          {(units.data ?? []).map((u: any) => {
+            const active = form.unitId === u.id;
+            return (
+              <Pressable
+                key={u.id}
+                onPress={() => setForm({ ...form, unitId: u.id })}
+                style={[s.chip, active && s.chipActive]}
+              >
+                <Text style={[s.chipText, active && { color: 'white' }]}>
+                  {u.block ? `${u.block}-` : ''}
+                  {u.number}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
 
-      <Pressable
-        style={[s.btn, (!form.name || !form.unitId) && { opacity: 0.5 }]}
-        disabled={!form.name || !form.unitId}
-        onPress={() => register.mutate()}
-      >
-        <Text style={s.btnText}>Registrar e notificar morador</Text>
-      </Pressable>
+        <Pressable
+          style={[s.btn, (!form.name || !form.unitId) && { opacity: 0.5 }]}
+          disabled={!form.name || !form.unitId}
+          onPress={() => register.mutate()}
+        >
+          <Text style={s.btnText}>Notificar morador</Text>
+        </Pressable>
+      </View>
 
-      <Text style={[s.h1, { marginTop: 32 }]}>Aguardando aprovação</Text>
+      <View style={s.sectionHead}>
+        <UsersIcon size={16} color={theme.ink700} />
+        <Text style={s.sectionTitle}>Aguardando aprovação</Text>
+        {(pending.data ?? []).length > 0 && (
+          <View style={s.badge}>
+            <Text style={s.badgeText}>{pending.data.length}</Text>
+          </View>
+        )}
+      </View>
+
       <FlatList
         data={pending.data ?? []}
         keyExtractor={(v: any) => v.id}
         scrollEnabled={false}
-        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
         renderItem={({ item }) => (
-          <View style={s.card}>
+          <View style={s.row}>
+            <View style={s.avatar}>
+              <Text style={s.avatarText}>
+                {item.name
+                  .split(' ')
+                  .map((w: string) => w[0])
+                  .slice(0, 2)
+                  .join('')}
+              </Text>
+            </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ color: theme.ink, fontWeight: '600' }}>{item.name}</Text>
-              <Text style={{ color: theme.muted, fontSize: 12 }}>
-                {item.unit?.block ? `Bl ${item.unit.block} • ` : ''}Ap {item.unit?.number}
+              <Text style={s.rowTitle}>{item.name}</Text>
+              <Text style={s.rowSub}>
+                {item.unit?.block ? `${item.unit.block}-` : ''}
+                {item.unit?.number} · aguardando
               </Text>
             </View>
             <Pressable
-              style={s.btnSmall}
+              style={s.rowBtn}
               onPress={() =>
                 Alert.alert('Check-in', `Confirmar entrada de ${item.name}?`, [
                   { text: 'Cancelar' },
@@ -119,11 +154,11 @@ export default function PorteiroRegister() {
                 ])
               }
             >
-              <Text style={{ color: '#fff', fontWeight: '600' }}>Entrada</Text>
+              <Text style={s.rowBtnText}>Entrada</Text>
             </Pressable>
           </View>
         )}
-        ListEmptyComponent={<Text style={{ color: theme.muted }}>Nada pendente</Text>}
+        ListEmptyComponent={<Text style={s.empty}>Nada pendente</Text>}
       />
     </ScrollView>
   );
@@ -131,47 +166,120 @@ export default function PorteiroRegister() {
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: theme.bg },
-  h1: { color: theme.ink, fontSize: 22, fontWeight: '700', marginBottom: 12 },
-  label: { color: theme.muted, fontSize: 12, textTransform: 'uppercase', marginTop: 14, letterSpacing: 1 },
-  input: {
-    backgroundColor: theme.panel2,
+  hero: {
+    backgroundColor: theme.primary50,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: theme.primary100,
+  },
+  heroIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: theme.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  heroOverline: {
+    color: theme.primary700,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  heroTitle: { color: theme.ink900, fontSize: 24, fontWeight: '800', marginTop: 4 },
+  heroSub: { color: theme.ink600, marginTop: 4 },
+
+  card: {
+    backgroundColor: theme.surface,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: theme.border,
-    color: theme.ink,
+    padding: 16,
+  },
+  label: {
+    color: theme.ink800,
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginTop: 14,
+    marginBottom: 6,
+  },
+  input: {
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.borderStrong,
+    color: theme.ink900,
     borderRadius: 12,
     padding: 12,
-    marginTop: 6,
+    fontSize: 15,
   },
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: theme.panel2,
+    backgroundColor: theme.surface,
     borderWidth: 1,
     borderColor: theme.border,
     marginRight: 8,
   },
+  chipActive: { backgroundColor: theme.ink900, borderColor: theme.ink900 },
+  chipText: { color: theme.ink800, fontWeight: '700', fontSize: 13 },
   btn: {
-    backgroundColor: theme.accent,
+    backgroundColor: theme.primary600,
     padding: 14,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: 20,
+    shadowColor: theme.primary600,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 3,
   },
-  btnText: { color: '#fff', fontWeight: '700' },
-  card: {
-    backgroundColor: theme.panel,
+  btnText: { color: 'white', fontWeight: '700', fontSize: 15 },
+
+  sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 28, marginBottom: 12 },
+  sectionTitle: { color: theme.ink900, fontSize: 17, fontWeight: '800', flex: 1 },
+  badge: {
+    backgroundColor: theme.dangerBg,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  badgeText: { color: theme.danger, fontSize: 11, fontWeight: '700' },
+
+  row: {
+    backgroundColor: theme.surface,
     borderWidth: 1,
     borderColor: theme.border,
     borderRadius: 14,
-    padding: 14,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
   },
-  btnSmall: {
-    backgroundColor: theme.accent,
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    backgroundColor: theme.primary100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: { color: theme.primary700, fontWeight: '700', fontSize: 13 },
+  rowTitle: { color: theme.ink900, fontWeight: '700', fontSize: 14 },
+  rowSub: { color: theme.ink600, fontSize: 12, marginTop: 2 },
+  rowBtn: {
+    backgroundColor: theme.primary600,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 10,
   },
+  rowBtnText: { color: 'white', fontWeight: '700', fontSize: 13 },
+  empty: { color: theme.ink500, fontStyle: 'italic', textAlign: 'center', marginTop: 20 },
 });
