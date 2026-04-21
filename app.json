@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "ToPortaria",
+    "slug": "toportaria",
+    "scheme": "toportaria",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B0C0F"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.toportaria.app" },
+    "android": {
+      "package": "com.toportaria.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B0C0F"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#D97757"
+        }
+      ],
+      "expo-barcode-scanner"
+    ],
+    "extra": {
+      "apiUrl": "http://localhost:3333/api",
+      "wsUrl": "http://localhost:3333"
+    }
+  }
+}
