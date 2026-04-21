@@ -1,0 +1,12 @@
+appId: com.toportaria.app
+name: Login invalido
+---
+- launchApp:
+    clearState: true
+- inputText: "morador@toportaria.com"
+- tapOn: "Senha"
+- inputText: "senhaerrada"
+- tapOn: "Entrar"
+- assertVisible:
+    text: "Erro"
+    timeout: 5000

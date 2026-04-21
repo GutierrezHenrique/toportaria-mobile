@@ -1,0 +1,25 @@
+appId: com.toportaria.app
+name: Porteiro registra visitante
+---
+- launchApp:
+    clearState: true
+- inputText: "porteiro@toportaria.com"
+- tapOn: "Senha"
+- inputText: "123456"
+- tapOn: "Entrar"
+- assertVisible:
+    text: "Registrar visitante"
+    timeout: 10000
+- tapOn: "Nome completo"
+- inputText: "Visitante E2E"
+- tapOn: "Documento"
+- inputText: "12345678900"
+- scrollUntilVisible:
+    element: "A-101"
+    direction: RIGHT
+    timeout: 5000
+- tapOn: "A-101"
+- tapOn: "Notificar morador"
+- assertVisible:
+    text: "Visitante registrado"
+    timeout: 5000

@@ -1,0 +1,20 @@
+appId: com.toportaria.app
+name: Morador gera código pré-auth
+---
+- launchApp:
+    clearState: true
+- inputText: "morador@toportaria.com"
+- tapOn: "Senha"
+- inputText: "123456"
+- tapOn: "Entrar"
+- assertVisible:
+    text: "Olá"
+    timeout: 10000
+- tapOn: "Convidar"
+- assertVisible: "Anunciar visita"
+- tapOn: "Nome do visitante"
+- inputText: "Convidado E2E"
+- tapOn: "Gerar código de entrada"
+- assertVisible:
+    text: "Código gerado"
+    timeout: 5000

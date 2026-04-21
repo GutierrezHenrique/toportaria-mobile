@@ -1,0 +1,19 @@
+appId: com.toportaria.app
+name: Morador login + aprovar visita
+---
+- launchApp:
+    clearState: true
+- assertVisible: "ToPortaria"
+- assertVisible: "Entre na portaria"
+- tapOn:
+    id: "email"
+    optional: true
+- inputText: "morador@toportaria.com"
+- tapOn: "Senha"
+- inputText: "123456"
+- tapOn: "Entrar"
+- assertVisible:
+    text: "Olá"
+    timeout: 10000
+- assertVisible: "Encomendas"
+- assertVisible: "Visitantes"

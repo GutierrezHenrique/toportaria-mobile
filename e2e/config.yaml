@@ -1,0 +1,5 @@
+flows:
+  - morador-login.yaml
+  - porteiro-register-visitor.yaml
+  - morador-preauth.yaml
+  - invalid-login.yaml
